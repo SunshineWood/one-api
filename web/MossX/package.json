@@ -39,7 +39,7 @@
     "yup": "^0.32.11"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "set PORT=3001 && react-scripts start",
     "build": "react-scripts build && mv -f build ../build/MossX",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
