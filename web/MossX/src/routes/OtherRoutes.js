@@ -3,6 +3,8 @@ import { lazy } from 'react';
 // project imports
 import Loadable from 'ui-component/Loadable';
 import MinimalLayout from 'layout/MinimalLayout';
+import NotifyUrl from '../views/Topup/Payment/NotifyUrl';
+import ReturnUrl from '../views/Topup/Payment/ReturnUrl';
 
 // login option 3 routing
 const AuthLogin = Loadable(lazy(() => import('views/Authentication/Auth/Login')));
@@ -61,6 +63,14 @@ const OtherRoutes = {
     {
       path: '/404',
       element: <NotFoundView />
+    },
+    {
+      path: '/notify_url',
+      element: <NotifyUrl />
+    },
+    {
+      path: '/return_url',
+      element: <ReturnUrl />
     }
   ]
 };

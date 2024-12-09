@@ -7,13 +7,39 @@ import UserCard from 'ui-component/cards/UserCard';
 import { API } from 'utils/api';
 import React, { useEffect, useState } from 'react';
 import { showError, showInfo, showSuccess, renderQuota } from 'utils/common';
+import PaymentDialog from '../Payment/epayapi';
 
 const TopupCard = () => {
   const theme = useTheme();
+  const [rechargeAmount, setRechargeAmount]=useState(10);
   const [redemptionCode, setRedemptionCode] = useState('');
   const [topUpLink, setTopUpLink] = useState('');
   const [userQuota, setUserQuota] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // 控制对话框显示状态
+  const [isPaymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  // 存储支付类型
+  const [paymentType, setPaymentType] = useState('');
+
+
+  // 处理支付宝支付点击
+  const handleAlipayClick = () => {
+    setPaymentType('alipay');
+    setPaymentDialogOpen(true);
+  };
+
+  // 处理微信支付点击
+  const handleWeixinClick = () => {
+    setPaymentType('wxpay');
+    setPaymentDialogOpen(true);
+  };
+
+  // 处理对话框关闭
+  const handleCloseDialog = () => {
+    setPaymentDialogOpen(false);
+    setPaymentType(''); // 清除支付类型
+  };
+
 
   const topUp = async () => {
     if (redemptionCode === '') {
@@ -78,6 +104,49 @@ const TopupCard = () => {
         <Typography variant="h4">当前额度:</Typography>
         <Typography variant="h4">{renderQuota(userQuota)}</Typography>
       </Stack>
+      <SubCard
+        sx={{
+          marginTop: '40px'
+        }}
+      >
+        <FormControl fullWidth variant="outlined">
+          <InputLabel htmlFor="key">充值</InputLabel>
+          <OutlinedInput
+            id="key"
+            label="充值金额"
+            type="text"
+            value={rechargeAmount}
+            onChange={(e) => {
+              setRechargeAmount(Number(e.target.value));
+            }}
+            name="key"
+            placeholder="请输入充值金额"
+            startAdornment={  // 添加这个部分
+              <InputAdornment position="start">
+                $
+              </InputAdornment>
+            }
+            endAdornment={
+              <InputAdornment position="end">
+                <Button variant="contained" onClick={handleAlipayClick} disabled={isSubmitting} style={{ marginRight: '10px' }}>
+                  {isSubmitting ? '充值中...' : '支付宝'}
+                </Button>
+                <Button variant="contained" onClick={handleWeixinClick} disabled={isSubmitting}>
+                  {isSubmitting ? '充值中...' : '微信'}
+                </Button>
+                <PaymentDialog
+                  open={isPaymentDialogOpen}
+                  onClose={handleCloseDialog}
+                  payType={paymentType}
+                  money={rechargeAmount/2}
+                  productName="MossX API"
+                />
+              </InputAdornment>
+            }
+            aria-describedby="helper-text-channel-quota-label"
+          />
+        </FormControl>
+      </SubCard>
       <SubCard
         sx={{
           marginTop: '40px'
