@@ -4,8 +4,8 @@ class EpayCore {
   constructor(config) {
     this.apiurl = config.apiurl;
     this.pid = config.pid;
-    this.notify_url = "http://127.0.0.1/notify_url";
-    this.return_url = "http://127.0.0.1/return_url";
+    this.notify_url = "http://localhost:3001/notify_url";
+    this.return_url = "http://localhost:3001/return_url";
     this.platform_public_key = config.platform_public_key;
     this.merchant_private_key = config.merchant_private_key;
     this.sign_type = 'RSA';
@@ -96,6 +96,8 @@ class EpayCore {
     params = { ...params };
     params.pid = this.pid;
     params.timestamp = Math.floor(Date.now()/1000).toString();
+    params.notify_url = this.notify_url;
+    params.return_url = this.return_url;
     params.sign = this.getSign(params);
     params.sign_type = this.sign_type;
     return params;
@@ -127,19 +129,16 @@ class EpayCore {
   // 商户私钥签名
   rsaPrivateSign(data) {
     try {
-      const key = "-----BEGIN PRIVATE KEY-----\n" +
-      this.merchant_private_key.match(/.{1,64}/g).join("\n") +
-      "\n-----END PRIVATE KEY-----";
-
-      const sig = new KJUR.crypto.Signature({
-        "alg": "SHA256withRSA"
-      });
-
-      sig.init(key);
-      sig.updateString(data);
-      const signatureBase64 = sig.sign();
-
-      return signatureBase64;
+      const key = KJUR.KEYUTIL.getKey(`-----BEGIN PRIVATE KEY-----\n${this.merchant_private_key}\n-----END PRIVATE KEY-----`);
+      // 创建 Signature 对象，设置签名编码算法
+      const signature = new KJUR.KJUR.crypto.Signature({ alg: "SHA256withRSA" });
+      // 初始化
+      signature.init(key);
+      signature.updateString(data);
+      // 生成密文
+      const originSign = signature.sign();
+      console.log(originSign)
+      return KJUR.hextob64(originSign);
     } catch (e) {
       throw new Error('签名失败，商户私钥错误: ' + e.message);
     }

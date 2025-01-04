@@ -70,7 +70,7 @@ const PaymentDialog = ({ open, onClose, payType, money, productName }) => {
       const response = epay.pagePay(paymentData);
 
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = response.data;
+      tempDiv.innerHTML = response;
       document.body.appendChild(tempDiv);
 
       const form = tempDiv.querySelector('form');
