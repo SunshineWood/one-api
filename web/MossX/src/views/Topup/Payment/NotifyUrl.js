@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import EpayCore from './Lib/EpayCore'; // 替换为实际的路径
-import epayConfig from './Lib/epay.config'; // 替换为实际的配置文件路径
+import epayConfig from './Lib/epay.config';
+import { API } from '../../../utils/api';
+import { showError, showSuccess } from '../../../utils/common'; // 替换为实际的配置文件路径
 
 const epay = new EpayCore(epayConfig);
 
@@ -17,13 +19,7 @@ const NotifyUrl = () => {
         const verifyResult = epay.verify(queryParams);
 
         if (verifyResult) {
-          const {
-            out_trade_no: outTradeNo,
-            trade_no: tradeNo,
-            trade_status: tradeStatus,
-            type,
-            money
-          } = queryParams;
+          const { out_trade_no: outTradeNo, trade_no: tradeNo, trade_status: tradeStatus, type, money } = queryParams;
 
           if (tradeStatus === 'TRADE_SUCCESS') {
             try {
@@ -56,11 +52,30 @@ const NotifyUrl = () => {
 // 订单处理函数
 async function processOrder(outTradeNo, tradeNo, money, type) {
   try {
-
+    await handleOrderProcessing(outTradeNo, tradeNo, money, type);
+    document.body.innerHTML = 'success';
   } catch (error) {
-    throw error;
+    console.error('订单处理错误:', error);
+    document.body.innerHTML = 'fail';
   }
 }
+
+// 处理订单逻辑
+async function handleOrderProcessing(outTradeNo, tradeNo, money, type) {
+  let redemptionCode="f5e424808e3148e6a54c98dfcb6c774b";
+  const res = await API.post('/api/user/topup', {
+    key: redemptionCode
+  });
+  redemptionCode="";
+  const { success, message, data } = res.data;
+  if (success) {
+    showSuccess('充值成功！');
+    // setUserQuota((quota) => quota + data);
+  } else {
+    throw new Error(message);
+  }
+}
+
 // 查询订单
 async function queryOrder(outTradeNo) {
   // 实现订单查询逻辑

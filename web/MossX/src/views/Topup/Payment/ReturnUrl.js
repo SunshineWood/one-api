@@ -41,7 +41,7 @@ const ReturnUrl = () => {
 
               // 3秒后跳转到订单页面
               setTimeout(() => {
-                navigate('/topup');
+                navigate('/panel/topup');
               }, 3000);
             } catch (error) {
               console.error('订单处理错误:', error);

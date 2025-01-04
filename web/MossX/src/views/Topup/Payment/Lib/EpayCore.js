@@ -1,5 +1,6 @@
-const KJUR = require('jsrsasign');
+import axios from 'axios';
 
+const KJUR = require('jsrsasign');
 class EpayCore {
   constructor(config) {
     this.apiurl = config.apiurl;
@@ -145,20 +146,16 @@ class EpayCore {
   }
 
 // 平台公钥验签
+  // 平台公钥验签
   rsaPublicVerify(data, sign) {
     try {
-      const key = "-----BEGIN PUBLIC KEY-----\n" +
-      this.platform_public_key.match(/.{1,64}/g).join("\n") +
-      "\n-----END PUBLIC KEY-----";
-
-      const sig = new KJUR.crypto.Signature({
+      const key = KJUR.KEYUTIL.getKey(`-----BEGIN PUBLIC KEY-----\n${this.platform_public_key}\n-----END PUBLIC KEY-----`);
+      const sig = new KJUR.KJUR.crypto.Signature({
         "alg": "SHA256withRSA"
       });
-
       sig.init(key);
       sig.updateString(data);
-      const result = sig.verify(sign);
-
+      const result = sig.verify((KJUR.b64tohex(sign)));
       return result;
     } catch (e) {
       throw new Error('验签失败，平台公钥错误: ' + e.message);
@@ -167,24 +164,20 @@ class EpayCore {
 
 
   // 请求外部资源
-  async getHttpResponse(url, post = false, timeout = 10000) {
-    const options = {
-      method: post ? 'POST' : 'GET',
-      headers: {
-        'Accept': '*/*',
-        'Accept-Language': 'zh-CN,zh;q=0.8',
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      timeout: timeout
-    };
-
-    if (post) {
-      options.body = post;
-    }
-
+  async getHttpResponse(url, postData = false, timeout = 10000) {
     try {
-      const response = await fetch(url, options);
-      return await response.text();
+      const response = await axios({
+        url,
+        method: postData ? 'POST' : 'GET',
+        headers: {
+          'Accept': '*/*',
+          'Accept-Language': 'zh-CN,zh;q=0.8',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: postData,
+        timeout: timeout
+      });
+      return response.data;
     } catch (error) {
       throw error;
     }

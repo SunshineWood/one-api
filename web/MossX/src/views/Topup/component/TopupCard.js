@@ -131,14 +131,14 @@ const TopupCard = () => {
                 <Button variant="contained" onClick={handleAlipayClick} disabled={isSubmitting} style={{ marginRight: '10px' }}>
                   {isSubmitting ? '充值中...' : '支付宝'}
                 </Button>
-                <Button variant="contained" onClick={handleWeixinClick} disabled={isSubmitting}>
-                  {isSubmitting ? '充值中...' : '微信'}
-                </Button>
+                {/*<Button variant="contained" onClick={handleWeixinClick} disabled={isSubmitting}>*/}
+                {/*  {isSubmitting ? '充值中...' : '微信'}*/}
+                {/*</Button>*/}
                 <PaymentDialog
                   open={isPaymentDialogOpen}
                   onClose={handleCloseDialog}
                   payType={paymentType}
-                  money={rechargeAmount/2}
+                  money={rechargeAmount/10}
                   productName="MossX API"
                 />
               </InputAdornment>
