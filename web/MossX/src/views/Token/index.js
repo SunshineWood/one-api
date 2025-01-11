@@ -20,6 +20,7 @@ import { ITEMS_PER_PAGE } from 'constants';
 import { IconRefresh, IconPlus } from '@tabler/icons-react';
 import EditeModal from './component/EditModal';
 import { useSelector } from 'react-redux';
+import BatchModal from "./component/BatchModal";
 
 export default function Token() {
   const [tokens, setTokens] = useState([]);
@@ -29,6 +30,7 @@ export default function Token() {
   const [openModal, setOpenModal] = useState(false);
   const [editTokenId, setEditTokenId] = useState(0);
   const siteInfo = useSelector((state) => state.siteInfo);
+  const [openBatchModal, setOpenBatchModal] = useState(false); // 新增批量模态窗口状态
 
   const loadTokens = async (startIdx) => {
     setSearching(true);
@@ -139,6 +141,21 @@ export default function Token() {
     }
   };
 
+  const handleOpenBatchModal = () => {
+    setOpenBatchModal(true);
+  };
+
+  const handleCloseBatchModal = () => {
+    setOpenBatchModal(false);
+  };
+
+  const handleOkBatchModal = (status) => {
+    if (status === true) {
+      handleCloseBatchModal();
+      handleRefresh();
+    }
+  };
+
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2.5}>
@@ -152,6 +169,14 @@ export default function Token() {
           startIcon={<IconPlus />}
         >
           新建令牌
+        </Button>
+        <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleOpenBatchModal}
+            startIcon={<IconPlus />}
+        >
+          批量新建令牌
         </Button>
       </Stack>
       <Stack mb={2}>
@@ -209,6 +234,7 @@ export default function Token() {
         />
       </Card>
       <EditeModal open={openModal} onCancel={handleCloseModal} onOk={handleOkModal} tokenId={editTokenId} />
+      <BatchModal open={openBatchModal} onCancel={handleCloseBatchModal} onOk={handleOkBatchModal} />
     </>
   );
 }
