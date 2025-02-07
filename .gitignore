@@ -11,5 +11,6 @@ data
 cmd.md
 .env
 /one-api
+/node_modules
 temp
 .DS_Store
